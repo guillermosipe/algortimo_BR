@@ -5,10 +5,18 @@
 # -------------------------------------------------------------------------------------
 
 import os
+import collections
 
 # -------------------------------------------------------------------------------------
 # ---------------------------- Functions ----------------------------------------------
 # -------------------------------------------------------------------------------------
+
+def testor(matrix):
+	for x in range(len(matrix)):
+		elements_in_line = collections.Counter(matrix[x])
+		if elements_in_line[1] == 0:
+			return False
+	return True
 
 def order_matrix(matrix):
 	new_matrix = []
@@ -18,7 +26,6 @@ def order_matrix(matrix):
 		#print (i,matrix[0][i])
 		if matrix[0][i]==1:
 			one_position.append(i)
-	print (one_position)
 	for line in range(len(matrix)):
 		aux_line = []
 		for new_order in one_position:
@@ -29,6 +36,22 @@ def order_matrix(matrix):
 		matrix[line] = aux_line
 
 	return matrix
+
+def excluyente(matrix):
+	fastidia = False
+	if len(matrix[0])==1:
+		return False
+	for x in range(len(matrix)):
+		elements_in_line=collections.Counter(matrix[x][0:-1])
+		# Mismo número de renglones en 0	
+		if elements_in_line[0] == len(matrix[x][0:-1]) and matrix[x][-1] == 1:
+			return False
+		# Fastidia el único renglón típico de alguna columna anterior
+		if elements_in_line[1] == 1 and matrix[x][-1] == 1:
+			fastidia = True
+	if not fastidia:
+		return False
+	return True
 
 # -------------------------------------------------------------------------------------
 # ---------------------------- Code ---------------------------------------------------
@@ -60,4 +83,31 @@ if __name__ == '__main__':
 	for line in matrix_2:
 		print (line)
 	print("\n")
+
+
+	matrix_1_excluyente = [ [1,0,0,0,0],
+							[0,1,0,0,0],
+							[0,0,0,1,1],
+							[0,0,1,0,1],
+							[1,0,1,0,1]]
+
+	matrix_2_excluyente = [ [0,0,0,0],
+							[1,0,0,0],
+							[0,0,1,1],
+							[0,1,0,1],
+							[0,1,0,1]]
+
+	matrix_3_excluyente = [[1],[0],[0],[0],[1]]
+
+	matrix_4_excluyente = [[1,1],[0,0],[0,0],[0,1],[1,0]]
+
+	print(excluyente(matrix_4_excluyente))
+
+	matrix_1_testor = [ [1,0,0,0],
+						[0,1,0,0],
+						[0,0,0,1],
+						[0,0,1,0],
+						[1,0,1,0]]
+
+	print(testor(matrix_1_testor))
 
