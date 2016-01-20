@@ -22,7 +22,7 @@ def tipico(matrix):
 	mask = matrix[0]
 	for x in range(len(matrix)-1):
 		mask = [x + y for x, y in zip(mask, matrix[x+1])]
-	print (mask)
+	#print (mask)
 	if collections.Counter(mask)[0] != 0:
 		return False
 	return True
@@ -43,7 +43,6 @@ def order_matrix(matrix):
 			if x not in one_position:
 				aux_line.append(matrix[line][x])
 		matrix[line] = aux_line
-
 	return matrix
 
 def excluyente(matrix):
@@ -84,8 +83,10 @@ def push_queue(queue,new_elements):
 	else:
 		return queue + new_elements
 
-def br_algorithm(matrix):
-	
+def superset_delete(queue,element):
+	return [x for x in queue if not set(x)>=set(element)]
+
+def br_algorithm(matrix):	
 	#print_matrix(matrix)
 	matrix = order_matrix(matrix)
 	#print_matrix(matrix)
@@ -93,24 +94,23 @@ def br_algorithm(matrix):
 	queue =  [[i] for i,x in enumerate(matrix[0]) if x == 1]
 	psi_star = []
 
-	#while(queue):
-	elements = queue.pop(0)
-	aux_matrix = sub_matrix(matrix,elements)
-	#print_matrix(aux_matrix)
-	if(testor(aux_matrix) and tipico(aux_matrix)):
-		psi_star.append(elements)
-		# eliminar subconjuntos
-	#elif(excluyente(aux_matrix)):
-		# eliminar subconjuntos
-	else:
-		new_elements = []
-		for x in range(len(matrix[0])):
-			if(x not in elements):
-				new_elements.append(elements+[x])
-		
-		queue = push_queue(queue,new_elements)
-		print(queue)
-
+	while(queue):
+		elements = queue.pop(0)
+		aux_matrix = sub_matrix(matrix,elements)
+		#print_matrix(aux_matrix)
+		if(testor(aux_matrix) and tipico(aux_matrix)):
+			psi_star.append(elements)
+			queue = superset_delete(queue,elements)
+		elif(excluyente(aux_matrix)):
+			queue = superset_delete(queue,elements)
+		else:
+			new_elements = []
+			for x in range(len(matrix[0])):
+				if(x not in elements):
+					new_elements.append(elements+[x])
+			queue = push_queue(queue,new_elements)
+			#print(queue)
+	print(psi_star)
 
 
 # -------------------------------------------------------------------------------------
@@ -133,47 +133,6 @@ if __name__ == '__main__':
 				[0,0,1,0],
 				[0,1,0,0]]
 
-	br_algorithm(matrix_1)
-
-	#print(push_queue([[0],[1]],[[2,3],[4,5]]))
-	#print(push_queue([[2, 3], [4, 5], [0], [1]],[[1,8,2],[1,8,3]]))
-
-	"""matrix_1 = order_matrix(matrix_1)
-	matrix_2 = order_matrix(matrix_2)
-
-	for line in matrix_1:
-		print (line)
-	print("\n")
+	br_algorithm(matrix_2)
 	
-	for line in matrix_2:
-		print (line)
-	print("\n")
-
-
-	matrix_1_excluyente = [ [1,0,0,0,0],
-							[0,1,0,0,0],
-							[0,0,0,1,1],
-							[0,0,1,0,1],
-							[1,0,1,0,1]]
-
-	matrix_2_excluyente = [ [0,0,0,0],
-							[1,0,0,0],
-							[0,0,1,1],
-							[0,1,0,1],
-							[0,1,0,1]]
-
-	matrix_3_excluyente = [[1],[0],[0],[0],[1]]
-
-	matrix_4_excluyente = [[1,1],[0,0],[0,0],[0,1],[1,0]]
-
-	print(excluyente(matrix_4_excluyente))
-
-	matrix_1_testor = [ [1,0,0,0],
-						[0,1,0,0],
-						[0,0,0,1],
-						[0,0,1,0],
-						[1,0,1,0]]
-
-	print(testor(matrix_1_testor))
-	print(tipico(matrix_1_testor))"""
 
