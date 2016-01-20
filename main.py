@@ -31,19 +31,14 @@ def order_matrix(matrix):
 	new_matrix = []
 	#for line in matrix:
 	one_position = []
+	zero_position = []
 	for i in range(len(matrix[0])):
 		#print (i,matrix[0][i])
 		if matrix[0][i]==1:
 			one_position.append(i)
-	for line in range(len(matrix)):
-		aux_line = []
-		for new_order in one_position:
-			aux_line.append(matrix[line][new_order])
-		for x in range(len(matrix[line])):
-			if x not in one_position:
-				aux_line.append(matrix[line][x])
-		matrix[line] = aux_line
-	return matrix
+		else:
+			zero_position.append(i)
+	return one_position ,zero_position
 
 def excluyente(matrix):
 	fastidia = False
@@ -51,10 +46,10 @@ def excluyente(matrix):
 		return False
 	for x in range(len(matrix)):
 		elements_in_line=collections.Counter(matrix[x][0:-1])
-		# Mismo número de renglones en 0	
+		# Mismo numero de renglones en 0	
 		if elements_in_line[0] == len(matrix[x][0:-1]) and matrix[x][-1] == 1:
 			return False
-		# Fastidia el único renglón típico de alguna columna anterior
+		# Fastidia el unico renglon tipico de alguna columna anterior
 		if elements_in_line[1] == 1 and matrix[x][-1] == 1:
 			fastidia = True
 	if not fastidia:
@@ -86,12 +81,13 @@ def push_queue(queue,new_elements):
 def superset_delete(queue,element):
 	return [x for x in queue if not set(x)>=set(element)]
 
-def br_algorithm(matrix):	
-	#print_matrix(matrix)
-	matrix = order_matrix(matrix)
-	#print_matrix(matrix)
+def br_algorithm(matrix):
+	print("Matriz de entrada:")	
+	print_matrix(matrix)
+	matrix_order = order_matrix(matrix)
 
-	queue =  [[i] for i,x in enumerate(matrix[0]) if x == 1]
+	queue =  [[x] for x in matrix_order[0]]
+	matrix_order = matrix_order[0] + matrix_order[1]
 	psi_star = []
 
 	while(queue):
@@ -110,7 +106,8 @@ def br_algorithm(matrix):
 					new_elements.append(elements+[x])
 			queue = push_queue(queue,new_elements)
 			#print(queue)
-	print(psi_star)
+	print("Testores Típics:")	
+	print_matrix(psi_star)
 
 
 # -------------------------------------------------------------------------------------
