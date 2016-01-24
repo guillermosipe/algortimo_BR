@@ -6,6 +6,7 @@
 
 import os
 import collections
+from optparse import OptionParser
 
 # -------------------------------------------------------------------------------------
 # ---------------------------- Functions ----------------------------------------------
@@ -59,8 +60,7 @@ def excluyente(matrix):
 
 def print_matrix(matrix):
 	for line in matrix:
-		print (line)
-	print("\n")
+		print ("\t",line)
 
 def sub_matrix(matrix,list_columns):
 	sub_matrix = []
@@ -82,7 +82,7 @@ def push_queue(queue,new_elements):
 def superset_delete(queue,element):
 	return [x for x in queue if not set(x)>=set(element)]
 
-def br_algorithm(matrix):
+def br_algorithm(matrix,print_steps=False):
 	print("Matriz de entrada:")	
 	print_matrix(matrix)
 	matrix_order = order_matrix(matrix)
@@ -91,35 +91,37 @@ def br_algorithm(matrix):
 	matrix_order = matrix_order[0] + matrix_order[1]
 	psi_star = []
 	column_num = len(matrix[0])
-
+	hits = 0
+	
 	while(queue):
-	#for x in range(0, 3):
+	#for x in range(0, 12):
+		hits += 1
+		queue_aux = queue[:]
 		elements = queue.pop(0)
 		aux_matrix = sub_matrix(matrix,elements)
-		queue_aux = queue[:]
-		action = ""
-		#print_matrix(aux_matrix)
 		if(testor(aux_matrix) and tipico(aux_matrix)):
 			psi_star.append(elements)
 			queue = superset_delete(queue,elements)
-			action = "testor y tipico"
+			action = "Es Testor y típico"
 		elif(excluyente(aux_matrix)):
-			action = "excluyente"
+			action = "Es excluyente"
 			queue = superset_delete(queue,elements)
 		else:
-			action = "fuera"
+			action = "Es candidato"
 			new_elements = []
-			#for x in range(max(elements),column_num):
-			for x in range(matrix_order.index(max(elements)),column_num):
-				if(x not in elements):
-					new_elements.append(elements+[x])
+			for x in range(matrix_order.index(elements[-1])+1,column_num):
+				new_elements.append(elements+[matrix_order[x]])
 			queue = push_queue(queue,new_elements)
-		#print(elements,"\n",action,"\n",queue_aux,"\n",queue,"\n\n")
+		if(print_steps==True):
+			print("Paso:",hits,"\nPila inicial:",queue_aux,"\nElemento:",elements)
+			print_matrix(sub_matrix(matrix,elements))
+			print("Acción:",action,"\nPila final",queue,"\n\n")
 	print("Testores Típicos:")	
 	for testor_print in psi_star:
-		print(sorted(testor_print),"\n")
+		print(sorted(testor_print))
 		print_matrix(sub_matrix(matrix,testor_print))
-	print("Número: ",len(psi_star))
+	print("Número:",len(psi_star))
+	print("Hits:",hits)
 	#print_matrix(psi_star)
 
 
@@ -130,6 +132,7 @@ def br_algorithm(matrix):
 if __name__ == '__main__':
 	# limpiado de consola
 	os.system('clear')
+
 	print("Algoritmo BR")
 
 	matrix_1 = [[1,0,0,0,0,0,0,1,0],
@@ -142,8 +145,22 @@ if __name__ == '__main__':
 				[1,0,0,0],
 				[0,0,1,0],
 				[0,1,0,0]]
-	
-	br_algorithm(matrix_1)
+
+	parser = OptionParser(usage="usage: %prog [options] arg1")
+	parser.add_option("-i", "--imprimir_pasos",
+                      type='choice',
+                      action='store',
+                      dest='imprimir_pasos',
+                      choices=['Y', 'N'],
+                      default='N',
+                      help="Muestra los pasos del Algoritmo BR")
+
+	(options, args) = parser.parse_args()
+
+	if options.imprimir_pasos=='Y':
+		br_algorithm(matrix_1,True)
+	else:
+		br_algorithm(matrix_1)
 	
 """ 
     Testores tipícos: 14
