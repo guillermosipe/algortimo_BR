@@ -43,7 +43,7 @@ def order_matrix(matrix):
 	return one_position ,zero_position
 
 def mascara(matrix):
-	mascara = [] 
+	mascara = []
 	for x in range(len(matrix)):
 		elements_in_line=collections.Counter(matrix[x][0:-1])
 		if(elements_in_line[1]==1):
@@ -71,9 +71,9 @@ def excluyente(matrix):
 				else:
 					mascara[t[0]] = [x]
 		#print(matrix[x][-1])
-		if matrix[x][-1]==1: 
+		if matrix[x][-1]==1:
 			mascara_add.append(x)
-		# Mismo numero de renglones en 0	
+		# Mismo numero de renglones en 0
 		if elements_in_line[0] == len(matrix[x][0:-1]) and matrix[x][-1] == 1:
 			mismo_cero = False
 
@@ -99,7 +99,7 @@ def sub_matrix(matrix,list_columns):
 		aux = []
 		for x in list_columns:
 			aux.append(line[x])
-		sub_matrix.append(aux) 
+		sub_matrix.append(aux)
 	return sub_matrix
 
 def push_queue(queue,new_elements):
@@ -117,7 +117,7 @@ def superset_delete(queue,element):
 	return [x for x in queue if not set(x)>=set(element)]
 
 def br_algorithm(matrix,print_steps=False):
-	print("Matriz de entrada:")	
+	print("Matriz de entrada:")
 	print_matrix(matrix)
 	matrix_order = order_matrix(matrix)
 
@@ -126,7 +126,7 @@ def br_algorithm(matrix,print_steps=False):
 	psi_star = []
 	column_num = len(matrix[0])
 	hits = 0
-	
+
 	while(queue):
 	#for x in range(0, 12):
 		hits += 1
@@ -134,12 +134,18 @@ def br_algorithm(matrix,print_steps=False):
 		elements = queue.pop(0)
 		aux_matrix = sub_matrix(matrix,elements)
 		if(testor(aux_matrix) and tipico(aux_matrix)):
-			psi_star.append(elements)
-			queue = superset_delete(queue,elements)
 			action = "Es Testor y típico"
+			psi_star.append(elements)
+			aux_hits = len(queue)
+			queue = superset_delete(queue,elements)
+			aux_hits -= len(queue)
+			hits += aux_hits
 		elif(excluyente(aux_matrix)):
 			action = "Es excluyente"
+			aux_hits = len(queue)
 			queue = superset_delete(queue,elements)
+			aux_hits -= len(queue)
+			hits += aux_hits
 		else:
 			action = "Es candidato"
 			new_elements = []
@@ -150,7 +156,7 @@ def br_algorithm(matrix,print_steps=False):
 			print("Paso:",hits,"\nPila inicial:",queue_aux,"\nElemento:",elements)
 			print_matrix(sub_matrix(matrix,elements))
 			print("Acción:",action,"\nPila final",queue,"\n\n")
-	print("Testores Típicos:")	
+	print("\nTestores Típicos:")
 	for testor_print in psi_star:
 		print(sorted(testor_print))
 		#print_matrix(sub_matrix(matrix,testor_print))
@@ -168,33 +174,35 @@ if __name__ == '__main__':
 	os.system('clear')
 
 	print("Algoritmo BR")
+	matrix = {
 
-	matrix_1 = [[1,0,0,0,0,0,0,1,0],
+	"articulo_br" : [[1,0,0,0,0,0,0,1,0],
 				[0,1,0,0,0,1,0,0,0],
 				[0,0,0,1,1,1,1,0,1],
 				[0,0,1,0,1,0,0,1,1],
-				[1,0,0,0,1,0,0,0,1]]
+				[1,0,0,0,1,0,0,0,1]],
 	# hits: 92
 
-	matrix_n2 = [[1,1,1,0,0],
+	"n2" : [[1,1,1,0,0],
 				[1,1,0,0,1],
 				[1,0,1,1,0],
-				[1,0,1,0,1]]
+				[1,0,1,0,1]],
 	# hits: 9
 
-	matrix_s = [[1,0,0,0,1,0],
+	"s" : [[1,0,0,0,1,0],
 				[1,1,0,0,0,1],
 				[0,0,1,0,0,1],
-				[1,0,0,1,0,1]]
+				[1,0,0,1,0,1]],
 
-	# hits: 21 
+	# hits: 21
 
-	# cavvadias y stravopolous pagina: trasnversales minimales 1-0 | 0-* 
+	# cavvadias y stravopolous pagina: trasnversales minimales 1-0 | 0-*
 
-	matrix_2 = [[0,0,0,1],
+	"identidad_basica" : [[0,0,0,1],
 				[1,0,0,0],
 				[0,0,1,0],
 				[0,1,0,0]]
+	}
 
 	parser = OptionParser(usage="usage: %prog [options] arg1")
 	parser.add_option("-i", "--imprimir_pasos",
@@ -203,7 +211,15 @@ if __name__ == '__main__':
                       dest='imprimir_pasos',
                       choices=['Y', 'N'],
                       default='N',
-                      help="Muestra los pasos del Algoritmo BR")
+                      help="Muestra los pasos del Algoritmo BR: Y(si), N(no)")
+
+	parser.add_option("-m", "--matriz",
+                      type='choice',
+                      action='store',
+                      dest='matrix',
+                      choices=['articulo_br','identidad_basica','n2', 's'],
+                      default='articulo_br',
+                      help="Selecciona la matriz a analizar: articulo_br,identidad_basica,n2,s")
 
 	(options, args) = parser.parse_args()
 
@@ -214,32 +230,31 @@ if __name__ == '__main__':
 
 	"""sub_matrix_ = sub_matrix(matrix_1,[0,2,4])
 	print_matrix(sub_matrix_)
-	
+
 	print(excluyente(sub_matrix_))"""
-	
 
 	if options.imprimir_pasos=='Y':
-		br_algorithm(matrix_s,True)
+		br_algorithm(matrix[options.matrix],True)
 	else:
-		br_algorithm(matrix_s)
-	
-""" 
+		br_algorithm(matrix[options.matrix])
+
+"""
     Testores tipícos: 14
-    	[5,7,8] 
-    	[4,7,5] 
-    	[1,7,8] 
-    	[1,7,4] 
-    	[0,1,2,6] 
-    	[0,1,2,3] 
-    	[0,1,6,7] 
-    	[0,1,3,7] 
-    	[0,5,8] 
-    	[0,4,8] 
-    	[0,2,5] 
-    	[0,1,8] 
-    	[0,1,4] 
-    	[0,5,7] 
+    	[5,7,8]
+    	[4,7,5]
+    	[1,7,8]
+    	[1,7,4]
+    	[0,1,2,6]
+    	[0,1,2,3]
+    	[0,1,6,7]
+    	[0,1,3,7]
+    	[0,5,8]
+    	[0,4,8]
+    	[0,2,5]
+    	[0,1,8]
+    	[0,1,4]
+    	[0,5,7]
 	Contador de hits: sacar de la pila -> 92
 	tamaño maximo de la lista pila
-	cantidad de memoria 
+	cantidad de memoria
 """
