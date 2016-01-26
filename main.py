@@ -42,21 +42,52 @@ def order_matrix(matrix):
 			zero_position.append(i)
 	return one_position ,zero_position
 
+def mascara(matrix):
+	mascara = [] 
+	for x in range(len(matrix)):
+		elements_in_line=collections.Counter(matrix[x][0:-1])
+		if(elements_in_line[1]==1):
+			mascara.append(x)
+	return mascara
+
 def excluyente(matrix):
+	fastidia_columnas = 0
+	num_columnas_uno = 0
+	mismo_cero = True
 	fastidia = False
+	mascara = {}
+	mascara_add = []
 	if len(matrix[0])==1:
 		return False
 	for x in range(len(matrix)):
 		elements_in_line=collections.Counter(matrix[x][0:-1])
+		test = list(enumerate(matrix[x][0:-1]))
+		test = list(filter(lambda x: x[1] == 1, test))
+		#print("-",test)
+		if(len(test)==1):
+			for t in test:
+				if mascara.get(t[0], False):
+					mascara[t[0]].append(x)
+				else:
+					mascara[t[0]] = [x]
+		#print(matrix[x][-1])
+		if matrix[x][-1]==1: 
+			mascara_add.append(x)
 		# Mismo numero de renglones en 0	
 		if elements_in_line[0] == len(matrix[x][0:-1]) and matrix[x][-1] == 1:
-			return False
-		# Fastidia el unico renglon tipico de alguna columna anterior
-		if elements_in_line[1] == 1 and matrix[x][-1] == 1:
+			mismo_cero = False
+
+	# Fastidia el unico renglon tipico de alguna columna anterior
+	#print(mascara,mascara_add)
+	for m in mascara:
+		#print(m,mascara[m])
+		if set(mascara[m]) <= set(mascara_add):
+			#print("SI")
 			fastidia = True
-	if not fastidia:
-		return False
-	return True
+
+	#if(num_columnas_uno==fastidia_columnas):
+	#	fastidia = True
+	return fastidia or mismo_cero
 
 def print_matrix(matrix):
 	for line in matrix:
@@ -65,7 +96,10 @@ def print_matrix(matrix):
 def sub_matrix(matrix,list_columns):
 	sub_matrix = []
 	for line in matrix:
-		sub_matrix.append([y for x,y in enumerate(line) if x in list_columns]) 
+		aux = []
+		for x in list_columns:
+			aux.append(line[x])
+		sub_matrix.append(aux) 
 	return sub_matrix
 
 def push_queue(queue,new_elements):
@@ -119,7 +153,7 @@ def br_algorithm(matrix,print_steps=False):
 	print("Testores Típicos:")	
 	for testor_print in psi_star:
 		print(sorted(testor_print))
-		print_matrix(sub_matrix(matrix,testor_print))
+		#print_matrix(sub_matrix(matrix,testor_print))
 	print("Número:",len(psi_star))
 	print("Hits:",hits)
 	#print_matrix(psi_star)
@@ -139,7 +173,23 @@ if __name__ == '__main__':
 				[0,1,0,0,0,1,0,0,0],
 				[0,0,0,1,1,1,1,0,1],
 				[0,0,1,0,1,0,0,1,1],
-				[1,0,1,0,1,0,0,0,1]]
+				[1,0,0,0,1,0,0,0,1]]
+	# hits: 92
+
+	matrix_n2 = [[1,1,1,0,0],
+				[1,1,0,0,1],
+				[1,0,1,1,0],
+				[1,0,1,0,1]]
+	# hits: 9
+
+	matrix_s = [[1,0,0,0,1,0],
+				[1,1,0,0,0,1],
+				[0,0,1,0,0,1],
+				[1,0,0,1,0,1]]
+
+	# hits: 21 
+
+	# cavvadias y stravopolous pagina: trasnversales minimales 1-0 | 0-* 
 
 	matrix_2 = [[0,0,0,1],
 				[1,0,0,0],
@@ -157,10 +207,21 @@ if __name__ == '__main__':
 
 	(options, args) = parser.parse_args()
 
+	#excluyente
+	"""sub_matrix_ = sub_matrix(matrix_1,[0,7,4])
+	print_matrix(sub_matrix_)
+	print(excluyente(sub_matrix_))"""
+
+	"""sub_matrix_ = sub_matrix(matrix_1,[0,2,4])
+	print_matrix(sub_matrix_)
+	
+	print(excluyente(sub_matrix_))"""
+	
+
 	if options.imprimir_pasos=='Y':
-		br_algorithm(matrix_1,True)
+		br_algorithm(matrix_s,True)
 	else:
-		br_algorithm(matrix_1)
+		br_algorithm(matrix_s)
 	
 """ 
     Testores tipícos: 14
