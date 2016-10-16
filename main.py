@@ -35,6 +35,20 @@ def tipico(matrix):
 	return True
 
 def order_matrix(matrix):
+	matrix_aux = []
+	x = [0,len(matrix[0])]
+	for line_pos in range(len(matrix)):
+		line_one = len(list(filter(lambda one:one==1,matrix[line_pos])))
+		if(x[1] > line_one):
+			x = [line_pos,line_one]
+	matrix_aux = matrix.pop(x[0])
+	matrix.insert(0,matrix_aux)
+	return matrix
+
+def getKey(element):
+	return element[1]
+
+def ones_and_zeros(matrix):
 	one_position = []
 	zero_position = []
 	for i in range(len(matrix[0])):
@@ -100,8 +114,8 @@ def superset_delete(queue,element):
 def br_algorithm(matrix,print_steps=False):
 	print("Matriz de entrada:")
 	print_matrix(matrix)
-	matrix_order = order_matrix(matrix)
-
+	matrix = order_matrix(matrix)
+	matrix_order = ones_and_zeros(matrix)
 	queue =  [[x] for x in matrix_order[0]]
 	matrix_order = matrix_order[0] + matrix_order[1]
 	psi_star = []
@@ -154,7 +168,8 @@ if __name__ == '__main__':
 	print("Algoritmo BR")
 	matrix = {
 
-	"articulo_br" : [[1,0,0,0,0,0,0,1,0],
+	"articulo_br" : [
+				[1,0,0,0,0,0,0,1,0],
 				[0,1,0,0,0,1,0,0,0],
 				[0,0,0,1,1,1,1,0,1],
 				[0,0,1,0,1,0,0,1,1],
